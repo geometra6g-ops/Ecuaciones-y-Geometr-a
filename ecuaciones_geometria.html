@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecuaciones con geometría — Maximática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1f33;
+  --bg-grid:#12304d;
+  --panel:#0f2740;
+  --panel-2:#123049;
+  --line:#2a4a68;
+  --line-soft:#1c3852;
+  --text:#eaf2fb;
+  --text-dim:#9fb7cd;
+  --text-mute:#6f8aa3;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --ok:#7fd99a;
+  --bad:#e8896a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px;}
+header.hero{
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+  border-radius:4px;
+  padding:28px 26px;
+  margin-bottom:22px;
+  position:relative;
+}
+header.hero::before{
+  content:"MAXIMÁTICA — HOJA DE TRABAJO 07";
+  position:absolute;top:10px;right:16px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--text-mute);
+}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:#e8a33d;text-transform:uppercase;margin:0 0 10px;}
+h1{font-size:26px;font-weight:600;margin:0 0 8px;line-height:1.25;}
+.hero p{color:var(--text-dim);font-size:14.5px;line-height:1.6;margin:0;max-width:620px;}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-family:var(--mono);font-size:11.5px;color:var(--text-mute);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend i{width:8px;height:8px;border-radius:1px;display:inline-block;}
+
+nav.topics{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:22px;}
+.tbtn{
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;
+  border:1px solid var(--line);background:var(--panel);color:var(--text-dim);
+  padding:11px 6px;border-radius:3px;cursor:pointer;text-align:center;line-height:1.35;
+}
+.tbtn b{display:block;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--text);margin-top:3px;}
+.tbtn.active{border-color:var(--accent);background:rgba(255,255,255,0.03);}
+.tbtn .pct{display:block;margin-top:5px;font-size:10px;color:var(--text-mute);}
+.tbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+section.topic{display:none;}
+section.topic.active{display:block;}
+
+.diagram-card{
+  border:1px solid var(--line);background:var(--panel);border-radius:4px;
+  padding:20px 22px 8px;margin-bottom:18px;
+}
+.diagram-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.topic-title{font-size:18px;font-weight:600;margin:0;}
+.topic-tag{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:.08em;}
+.topic-blurb{color:var(--text-dim);font-size:13.5px;line-height:1.6;margin:6px 0 14px;max-width:640px;}
+.svgbox{border-top:1px dashed var(--line-soft);padding:16px 0;display:flex;justify-content:center;}
+.svgbox svg{max-width:100%;height:auto;}
+
+.progress-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--text-mute);margin:14px 0 20px;}
+.progress-track{flex:1;height:5px;background:var(--line-soft);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);width:0%;transition:width .3s;}
+
+.ex{
+  border:1px solid var(--line);background:var(--panel-2);border-radius:4px;
+  padding:16px 18px;margin-bottom:12px;
+}
+.ex.correct{border-color:var(--ok);}
+.ex-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.level-badge{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--accent);
+  border:1px solid var(--line);padding:3px 8px;border-radius:2px;
+}
+.ex-num{font-family:var(--mono);font-size:11px;color:var(--text-mute);}
+.ex-statement{font-size:14.5px;line-height:1.6;margin:0 0 12px;}
+.ex-statement .eq{font-family:var(--mono);color:var(--text);background:rgba(255,255,255,0.03);padding:1px 5px;border-radius:2px;}
+.ex-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ex-controls input{
+  font-family:var(--mono);font-size:14px;width:80px;padding:8px 10px;
+  background:var(--bg);border:1px solid var(--line);border-radius:3px;color:var(--text);
+}
+.ex-controls input:focus{outline:none;border-color:var(--accent);}
+.ex-controls button{
+  font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 14px;
+  background:transparent;border:1px solid var(--line);border-radius:3px;color:var(--text);cursor:pointer;
+}
+.ex-controls button.check{border-color:var(--accent);color:var(--accent);}
+.ex-controls button:hover{background:rgba(255,255,255,0.04);}
+.ex-feedback{font-family:var(--mono);font-size:12.5px;margin-left:2px;}
+.ex-feedback.ok{color:var(--ok);}
+.ex-feedback.bad{color:var(--bad);}
+.help-toggle{font-family:var(--mono);font-size:11px;color:var(--text-mute);background:none;border:none;text-decoration:underline;cursor:pointer;padding:0;margin-left:auto;}
+.help-body{
+  display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-soft);
+  font-size:13px;color:var(--text-dim);line-height:1.7;
+}
+.help-body.show{display:block;}
+.help-body ol{margin:0;padding-left:18px;}
+
+footer{margin-top:30px;text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--text-mute);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Ecuaciones · segundo año</p>
+  <h1>Ecuaciones con geometría como marco</h1>
+  <p>Seis contenidos geométricos, cada uno con cinco ecuaciones que suben de dificultad: simples → distributiva → distributiva con término suelto → incógnita en ambos miembros → combinado. Todas las soluciones son números naturales.</p>
+  <div class="legend" id="legend"></div>
+</header>
+
+<nav class="topics" id="topicNav"></nav>
+
+<div id="topicSections"></div>
+
+<footer>MAXIMÁTICA — hecho para practicar, no para copiar</footer>
+</div>
+
+<script>
+const TOPICS = [
+{
+  id:"t1", tag:"01", color:"#e8a33d",
+  title:"Ángulos opuestos por el vértice y adyacentes",
+  blurb:"Dos rectas que se cruzan forman dos pares de ángulos opuestos por el vértice (iguales entre sí) y pares de ángulos adyacentes (suman 180°, ángulo llano).",
+  svg:`<svg viewBox="0 0 320 220" width="320" height="220" role="img" aria-label="Dos rectas que se cruzan formando cuatro ángulos">
+    <line x1="30" y1="190" x2="290" y2="30" stroke="#5a83a8" stroke-width="2"/>
+    <line x1="40" y1="30" x2="280" y2="190" stroke="#5a83a8" stroke-width="2"/>
+    <circle cx="160" cy="110" r="3" fill="#e8a33d"/>
+    <path d="M 172 92 A 24 24 0 0 1 178 112" fill="none" stroke="#e8a33d" stroke-width="1.6"/>
+    <path d="M 148 128 A 24 24 0 0 1 142 108" fill="none" stroke="#e8a33d" stroke-width="1.6"/>
+    <path d="M 182 118 A 24 24 0 0 1 158 137" fill="none" stroke="#6fb3d9" stroke-width="1.6"/>
+    <text x="188" y="98" font-family="IBM Plex Mono" font-size="12" fill="#e8a33d">α</text>
+    <text x="128" y="132" font-family="IBM Plex Mono" font-size="12" fill="#e8a33d">α</text>
+    <text x="165" y="150" font-family="IBM Plex Mono" font-size="12" fill="#6fb3d9">β</text>
+    <text x="20" y="200" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">opuestos por el vértice: α = α</text>
+    <text x="20" y="216" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">adyacentes: α + β = 180°</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'Dos ángulos adyacentes forman un ángulo llano. Uno mide <span class="eq">132°</span> y el otro <span class="eq">x</span>.',eq:"x + 132 = 180", answer:48, steps:["Los ángulos adyacentes suman 180°.","x + 132 = 180","x = 180 − 132 = 48"]},
+    {level:2,tag:"Distributiva",statement:'Dos ángulos opuestos por el vértice miden <span class="eq">6(x − 3)°</span> y <span class="eq">78°</span>.',eq:"6(x − 3) = 78", answer:16, steps:["Los ángulos opuestos por el vértice son iguales.","6(x − 3) = 78","x − 3 = 78 ÷ 6 = 13","x = 13 + 3 = 16"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'Un ángulo mide <span class="eq">[4(x + 2) + 18]°</span> y es opuesto por el vértice a un ángulo de <span class="eq">150°</span>.',eq:"4(x + 2) + 18 = 150", answer:31, steps:["4(x + 2) + 18 = 150","4(x + 2) = 132","x + 2 = 33","x = 31"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'Dos ángulos opuestos por el vértice miden <span class="eq">(7x + 4)°</span> y <span class="eq">(4x + 58)°</span>.',eq:"7x + 4 = 4x + 58", answer:18, steps:["7x + 4 = 4x + 58","7x − 4x = 58 − 4","3x = 54","x = 18"]},
+    {level:5,tag:"Combinado",statement:'Dos ángulos adyacentes miden <span class="eq">2(x + 3)°</span> y <span class="eq">3(x − 2)°</span>, y juntos forman un ángulo llano.',eq:"2(x + 3) + 3(x − 2) = 180", answer:36, steps:["2x + 6 + 3x − 6 = 180","5x = 180","x = 36"]}
+  ]
+},
+{
+  id:"t2", tag:"02", color:"#e85d4a",
+  title:"Suma de ángulos interiores del triángulo",
+  blurb:"En todo triángulo, la suma de sus tres ángulos interiores es siempre 180°.",
+  svg:`<svg viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="Triángulo con sus tres ángulos interiores marcados">
+    <polygon points="60,170 260,170 150,40" fill="none" stroke="#5a83a8" stroke-width="2"/>
+    <path d="M 78 170 A 20 20 0 0 1 70 152" fill="none" stroke="#e85d4a" stroke-width="1.6"/>
+    <path d="M 242 170 A 20 20 0 0 0 250 152" fill="none" stroke="#e85d4a" stroke-width="1.6"/>
+    <path d="M 138 58 A 20 20 0 0 1 162 58" fill="none" stroke="#e85d4a" stroke-width="1.6"/>
+    <text x="82" y="163" font-family="IBM Plex Mono" font-size="12" fill="#e85d4a">A</text>
+    <text x="228" y="163" font-family="IBM Plex Mono" font-size="12" fill="#e85d4a">B</text>
+    <text x="145" y="66" font-family="IBM Plex Mono" font-size="12" fill="#e85d4a">C</text>
+    <text x="90" y="196" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">A + B + C = 180°</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'En un triángulo, dos ángulos miden <span class="eq">55°</span> y <span class="eq">63°</span>, y el tercero mide <span class="eq">x</span>.',eq:"x + 55 + 63 = 180", answer:62, steps:["x + 55 + 63 = 180","x + 118 = 180","x = 62"]},
+    {level:2,tag:"Distributiva",statement:'En un triángulo, un ángulo mide <span class="eq">3(x − 4)°</span>, y los otros dos <span class="eq">40°</span> y <span class="eq">50°</span>.',eq:"3(x − 4) + 40 + 50 = 180", answer:34, steps:["3(x − 4) + 90 = 180","3(x − 4) = 90","x − 4 = 30","x = 34"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'En un triángulo, un ángulo mide <span class="eq">[2(x + 4) + 10]°</span>, y los otros dos <span class="eq">45°</span> y <span class="eq">57°</span>.',eq:"2(x + 4) + 10 + 45 + 57 = 180", answer:30, steps:["2(x + 4) + 112 = 180","2(x + 4) = 68","x + 4 = 34","x = 30"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'Un triángulo isósceles tiene dos ángulos iguales que miden <span class="eq">(5x + 2)°</span> y <span class="eq">(3x + 18)°</span>.',eq:"5x + 2 = 3x + 18", answer:8, steps:["5x + 2 = 3x + 18","2x = 16","x = 8"]},
+    {level:5,tag:"Combinado",statement:'En un triángulo, los tres ángulos miden <span class="eq">4(x − 2)°</span>, <span class="eq">3(x + 1)°</span> y <span class="eq">(x + 9)°</span>.',eq:"4(x − 2) + 3(x + 1) + (x + 9) = 180", answer:22, steps:["4x − 8 + 3x + 3 + x + 9 = 180","8x + 4 = 180","8x = 176","x = 22"]}
+  ]
+},
+{
+  id:"t3", tag:"03", color:"#4fc3d9",
+  title:"Teorema de Pitágoras",
+  blurb:"En todo triángulo rectángulo, el cuadrado de la hipotenusa es igual a la suma de los cuadrados de los catetos: a² + b² = c².",
+  svg:`<svg viewBox="0 0 380 340" width="320" height="286" role="img" aria-label="Triángulo rectángulo con un cuadrado construido sobre cada lado">
+    <polygon points="160,220 260,220 260,320 160,320" fill="none" stroke="#4fc3d9" stroke-width="1.4"/>
+    <polygon points="160,220 160,120 60,120 60,220" fill="none" stroke="#4fc3d9" stroke-width="1.4"/>
+    <polygon points="160,120 260,220 360,120 260,20" fill="none" stroke="#4fc3d9" stroke-width="1.4"/>
+    <polygon points="160,220 260,220 160,120" fill="none" stroke="#5a83a8" stroke-width="2"/>
+    <path d="M 160 205 L 175 205 L 175 220" fill="none" stroke="#5a83a8" stroke-width="1.3"/>
+    <text x="203" y="275" font-family="IBM Plex Mono" font-size="13" fill="#4fc3d9">a²</text>
+    <text x="93" y="174" font-family="IBM Plex Mono" font-size="13" fill="#4fc3d9">b²</text>
+    <text x="245" y="118" font-family="IBM Plex Mono" font-size="13" fill="#4fc3d9">c²</text>
+    <text x="205" y="238" font-family="IBM Plex Mono" font-size="11" fill="#eaf2fb">a</text>
+    <text x="138" y="175" font-family="IBM Plex Mono" font-size="11" fill="#eaf2fb">b</text>
+    <text x="188" y="158" font-family="IBM Plex Mono" font-size="11" fill="#eaf2fb">c</text>
+    <text x="120" y="332" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">a² + b² = c²</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'Un cateto mide <span class="eq">9 cm</span> y la hipotenusa <span class="eq">15 cm</span> (9² + 12² = 15²). El otro cateto mide <span class="eq">(x + 3) cm</span>.',eq:"x + 3 = 12", answer:9, steps:["El cateto que falta mide 12 cm (terna 9-12-15).","x + 3 = 12","x = 9"]},
+    {level:2,tag:"Distributiva",statement:'Un cateto mide <span class="eq">8 cm</span> y la hipotenusa <span class="eq">17 cm</span> (8² + 15² = 17²). El otro cateto mide <span class="eq">3(x − 2) cm</span>.',eq:"3(x − 2) = 15", answer:7, steps:["El cateto que falta mide 15 cm (terna 8-15-17).","3(x − 2) = 15","x − 2 = 5","x = 7"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'Un cateto mide <span class="eq">7 cm</span> y la hipotenusa <span class="eq">25 cm</span> (7² + 24² = 25²). El otro cateto mide <span class="eq">[2(x + 3) + 6] cm</span>.',eq:"2(x + 3) + 6 = 24", answer:6, steps:["El cateto que falta mide 24 cm (terna 7-24-25).","2(x + 3) + 6 = 24","2(x + 3) = 18","x + 3 = 9","x = 6"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'Un cateto mide <span class="eq">12 cm</span> y la hipotenusa <span class="eq">37 cm</span> (12² + 35² = 37²). El otro cateto se expresó de dos formas: <span class="eq">(3x − 4) cm</span> y <span class="eq">(2x + 9) cm</span>.',eq:"3x − 4 = 2x + 9", answer:13, steps:["Ambas expresiones representan el mismo cateto (35 cm).","3x − 4 = 2x + 9","x = 13"]},
+    {level:5,tag:"Combinado",statement:'Un cateto mide <span class="eq">15 cm</span> y la hipotenusa <span class="eq">25 cm</span> (15² + 20² = 25²). El otro cateto se expresó como <span class="eq">2(x − 4) cm</span> y también como <span class="eq">[3(x − 8) + 2] cm</span>.',eq:"2(x − 4) = 3(x − 8) + 2", answer:14, steps:["2x − 8 = 3x − 24 + 2","2x − 8 = 3x − 22","−8 + 22 = 3x − 2x","x = 14"]}
+  ]
+},
+{
+  id:"t4", tag:"04", color:"#9b7ede",
+  title:"Teorema de Thales",
+  blurb:"Si dos o más rectas paralelas cortan a dos transversales, los segmentos que determinan sobre ellas son proporcionales.",
+  svg:`<svg viewBox="0 0 360 245" width="320" height="218" role="img" aria-label="Triángulo con una recta paralela a la base, que forma segmentos proporcionales">
+    <polygon points="180,20 60,190 300,190" fill="none" stroke="#5a83a8" stroke-width="2"/>
+    <line x1="114" y1="113.5" x2="246" y2="113.5" stroke="#9b7ede" stroke-width="2" stroke-dasharray="5 4"/>
+    <circle cx="180" cy="20" r="3" fill="#5a83a8"/>
+    <circle cx="60" cy="190" r="3" fill="#5a83a8"/>
+    <circle cx="300" cy="190" r="3" fill="#5a83a8"/>
+    <circle cx="114" cy="113.5" r="3" fill="#9b7ede"/>
+    <circle cx="246" cy="113.5" r="3" fill="#9b7ede"/>
+    <text x="172" y="13" font-family="IBM Plex Mono" font-size="12" fill="#eaf2fb">A</text>
+    <text x="40" y="205" font-family="IBM Plex Mono" font-size="12" fill="#eaf2fb">B</text>
+    <text x="306" y="205" font-family="IBM Plex Mono" font-size="12" fill="#eaf2fb">C</text>
+    <text x="90" y="107" font-family="IBM Plex Mono" font-size="12" fill="#9b7ede">D</text>
+    <text x="252" y="107" font-family="IBM Plex Mono" font-size="12" fill="#9b7ede">E</text>
+    <text x="102" y="230" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">AD/DB = AE/EC  (DE ∥ BC)</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'Al aplicar Thales sobre dos segmentos correspondientes de dos rectas cortadas por paralelas, se obtiene la ecuación <span class="eq">4x = 76</span>.',eq:"4x = 76", answer:19, steps:["4x = 76","x = 76 ÷ 4 = 19"]},
+    {level:2,tag:"Distributiva",statement:'De la proporción entre segmentos correspondientes se obtiene <span class="eq">3(x + 2) = 81</span>.',eq:"3(x + 2) = 81", answer:25, steps:["3(x + 2) = 81","x + 2 = 27","x = 25"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'Al plantear la proporción entre dos transversales cortadas por tres paralelas se llega a <span class="eq">2(x − 3) + 9 = 57</span>.',eq:"2(x − 3) + 9 = 57", answer:27, steps:["2(x − 3) + 9 = 57","2(x − 3) = 48","x − 3 = 24","x = 27"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'Dos segmentos correspondientes, expresados de formas equivalentes por la proporcionalidad, cumplen <span class="eq">5x + 8 = 3x + 88</span>.',eq:"5x + 8 = 3x + 88", answer:40, steps:["5x + 8 = 3x + 88","2x = 80","x = 40"]},
+    {level:5,tag:"Combinado",statement:'La proporción de Thales, ya simplificada, da <span class="eq">3(x + 2) + 4 = 2(x + 13) + 4</span>.',eq:"3(x + 2) + 4 = 2(x + 13) + 4", answer:20, steps:["3x + 6 + 4 = 2x + 26 + 4","3x + 10 = 2x + 30","x = 20"]}
+  ]
+},
+{
+  id:"t5", tag:"05", color:"#8fcb6b",
+  title:"Perímetro y área: triángulo, cuadrado y rectángulo",
+  blurb:"El perímetro es la suma de todos los lados. El cuadrado tiene sus 4 lados iguales; el rectángulo, lados opuestos iguales.",
+  svg:`<svg viewBox="0 0 320 180" width="320" height="180" role="img" aria-label="Cuadrado y rectángulo con sus lados marcados">
+    <rect x="30" y="40" width="80" height="80" fill="none" stroke="#8fcb6b" stroke-width="2"/>
+    <text x="55" y="30" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">lado</text>
+    <text x="10" y="85" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">P=4·l</text>
+    <rect x="160" y="55" width="130" height="55" fill="none" stroke="#8fcb6b" stroke-width="2"/>
+    <text x="205" y="45" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">largo</text>
+    <text x="295" y="87" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">ancho</text>
+    <text x="185" y="150" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">P=2·(largo+ancho)</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'Un triángulo tiene lados <span class="eq">x</span>, <span class="eq">14 cm</span> y <span class="eq">21 cm</span>, y su perímetro es <span class="eq">50 cm</span>.',eq:"x + 14 + 21 = 50", answer:15, steps:["x + 35 = 50","x = 15"]},
+    {level:2,tag:"Distributiva",statement:'La suma de dos lados consecutivos de un rectángulo es <span class="eq">(x + 11) cm</span>, y su perímetro es <span class="eq">78 cm</span>.',eq:"2(x + 11) = 78", answer:28, steps:["2(x + 11) = 78","x + 11 = 39","x = 28"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'El perímetro de un cuadrado de lado <span class="eq">(x + 3) cm</span>, aumentado en <span class="eq">18 cm</span>, es <span class="eq">98 cm</span>.',eq:"4(x + 3) + 18 = 98", answer:17, steps:["4(x + 3) + 18 = 98","4(x + 3) = 80","x + 3 = 20","x = 17"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'Un triángulo isósceles tiene sus dos lados iguales expresados como <span class="eq">(6x + 3) cm</span> y <span class="eq">(4x + 45) cm</span>.',eq:"6x + 3 = 4x + 45", answer:21, steps:["6x + 3 = 4x + 45","2x = 42","x = 21"]},
+    {level:5,tag:"Combinado",statement:'Un cuadrado de lado <span class="eq">(x + 4) cm</span> tiene el mismo perímetro que un rectángulo de lados <span class="eq">(x − 1) cm</span> y <span class="eq">20 cm</span>.',eq:"4(x + 4) = 2[(x − 1) + 20]", answer:11, steps:["4x + 16 = 2(x + 19)","4x + 16 = 2x + 38","2x = 22","x = 11"]}
+  ]
+},
+{
+  id:"t6", tag:"06", color:"#e874a1",
+  title:"Perímetro de polígonos regulares: pentágono y hexágono",
+  blurb:"En un polígono regular todos los lados miden lo mismo, así que el perímetro es el número de lados multiplicado por la medida de un lado.",
+  svg:`<svg viewBox="0 0 320 190" width="320" height="190" role="img" aria-label="Pentágono y hexágono regulares con un lado marcado">
+    <polygon points="75,25 118,58 101,110 49,110 32,58" fill="none" stroke="#e874a1" stroke-width="2"/>
+    <text x="45" y="140" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">P = 5 · lado</text>
+    <polygon points="235,25 270,45 270,85 235,105 200,85 200,45" fill="none" stroke="#e874a1" stroke-width="2"/>
+    <text x="200" y="140" font-family="IBM Plex Mono" font-size="11" fill="#6f8aa3">P = 6 · lado</text>
+  </svg>`,
+  exercises:[
+    {level:1,tag:"Simple",statement:'Un pentágono regular tiene perímetro <span class="eq">115 cm</span> y lado <span class="eq">x</span>.',eq:"5x = 115", answer:23, steps:["5x = 115","x = 23"]},
+    {level:2,tag:"Distributiva",statement:'Un hexágono regular tiene perímetro <span class="eq">144 cm</span> y lado <span class="eq">(x − 2) cm</span>.',eq:"6(x − 2) = 144", answer:26, steps:["6(x − 2) = 144","x − 2 = 24","x = 26"]},
+    {level:3,tag:"Distributiva + término suelto",statement:'El perímetro de un pentágono regular de lado <span class="eq">(x + 4) cm</span>, aumentado en <span class="eq">15 cm</span>, es <span class="eq">200 cm</span>.',eq:"5(x + 4) + 15 = 200", answer:33, steps:["5(x + 4) + 15 = 200","5(x + 4) = 185","x + 4 = 37","x = 33"]},
+    {level:4,tag:"Incógnita en ambos miembros",statement:'El lado de un hexágono regular se expresó de dos formas equivalentes: <span class="eq">(3x + 10) cm</span> y <span class="eq">(2x + 55) cm</span>.',eq:"3x + 10 = 2x + 55", answer:45, steps:["3x + 10 = 2x + 55","x = 45"]},
+    {level:5,tag:"Combinado",statement:'Un hexágono regular de lado <span class="eq">(x + 5) cm</span> tiene el mismo perímetro que un pentágono regular de lado <span class="eq">(x + 16) cm</span>.',eq:"6(x + 5) = 5(x + 16)", answer:50, steps:["6x + 30 = 5x + 80","x = 50"]}
+  ]
+}
+];
+
+const nav = document.getElementById('topicNav');
+const sections = document.getElementById('topicSections');
+const legend = document.getElementById('legend');
+
+TOPICS.forEach((t,i)=>{
+  const b = document.createElement('button');
+  b.className = 'tbtn' + (i===0?' active':'');
+  b.style.setProperty('--accent', t.color);
+  b.innerHTML = t.tag + '<b>' + shortTitle(t.title) + '</b><span class="pct" id="pct-'+t.id+'">0/5</span>';
+  b.onclick = ()=>selectTopic(t.id);
+  nav.appendChild(b);
+
+  const l = document.createElement('span');
+  l.innerHTML = '<i style="background:'+t.color+'"></i>' + t.tag + ' ' + shortTitle(t.title);
+  legend.appendChild(l);
+
+  const sec = document.createElement('section');
+  sec.className = 'topic' + (i===0?' active':'');
+  sec.id = 'sec-'+t.id;
+  sec.style.setProperty('--accent', t.color);
+
+  let exHtml = '';
+  t.exercises.forEach((ex,idx)=>{
+    exHtml += `
+    <div class="ex" id="${t.id}-ex${idx}">
+      <div class="ex-head">
+        <span class="level-badge">Nivel ${ex.level} · ${ex.tag}</span>
+        <span class="ex-num">${idx+1} / 5</span>
+      </div>
+      <p class="ex-statement">${ex.statement}</p>
+      <div class="ex-controls">
+        <input type="number" placeholder="x =" id="${t.id}-in${idx}">
+        <button class="check" onclick="checkAnswer('${t.id}',${idx},${ex.answer})">Comprobar</button>
+        <span class="ex-feedback" id="${t.id}-fb${idx}"></span>
+        <button class="help-toggle" onclick="toggleHelp('${t.id}',${idx})">ver resolución</button>
+      </div>
+      <div class="help-body" id="${t.id}-help${idx}">
+        <ol>${ex.steps.map(s=>'<li>'+s+'</li>').join('')}</ol>
+      </div>
+    </div>`;
+  });
+
+  sec.innerHTML = `
+    <div class="diagram-card">
+      <div class="diagram-head">
+        <p class="topic-title">${t.title}</p>
+        <span class="topic-tag">${t.tag}</span>
+      </div>
+      <p class="topic-blurb">${t.blurb}</p>
+      <div class="svgbox">${t.svg}</div>
+    </div>
+    <div class="progress-row">
+      <span>progreso</span>
+      <div class="progress-track"><div class="progress-fill" id="fill-${t.id}"></div></div>
+      <span id="count-${t.id}">0/5 resueltos</span>
+    </div>
+    ${exHtml}
+  `;
+  sections.appendChild(sec);
+});
+
+function shortTitle(s){
+  const map = {
+    "Ángulos opuestos por el vértice y adyacentes":"Ángulos opuestos / adyacentes",
+    "Suma de ángulos interiores del triángulo":"Ángulos del triángulo",
+    "Teorema de Pitágoras":"Pitágoras",
+    "Teorema de Thales":"Thales",
+    "Perímetro y área: triángulo, cuadrado y rectángulo":"Perímetros básicos",
+    "Perímetro de polígonos regulares: pentágono y hexágono":"Polígonos regulares"
+  };
+  return map[s] || s;
+}
+
+function selectTopic(id){
+  document.querySelectorAll('.topic').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  [...nav.children].forEach((b,i)=>{ if(TOPICS[i].id===id) b.classList.add('active'); });
+}
+
+function checkAnswer(tid, idx, correct){
+  const input = document.getElementById(`${tid}-in${idx}`);
+  const fb = document.getElementById(`${tid}-fb${idx}`);
+  const val = input.value.trim();
+  if(val===''){
+    fb.textContent = 'ingresá un valor primero';
+    fb.className = 'ex-feedback bad';
+    return;
+  }
+  const num = Number(val);
+  const exCard = document.getElementById(`${tid}-ex${idx}`);
+  if(num === correct){
+    fb.textContent = 'correcto — x = ' + correct;
+    fb.className = 'ex-feedback ok';
+    exCard.classList.add('correct');
+  } else {
+    fb.textContent = 'todavía no. probá de nuevo';
+    fb.className = 'ex-feedback bad';
+    exCard.classList.remove('correct');
+  }
+  updateProgress(tid);
+}
+
+function toggleHelp(tid, idx){
+  document.getElementById(`${tid}-help${idx}`).classList.toggle('show');
+}
+
+function updateProgress(tid){
+  const topic = TOPICS.find(t=>t.id===tid);
+  let solved = 0;
+  topic.exercises.forEach((ex,idx)=>{
+    if(document.getElementById(`${tid}-ex${idx}`).classList.contains('correct')) solved++;
+  });
+  document.getElementById(`fill-${tid}`).style.width = (solved/5*100)+'%';
+  document.getElementById(`count-${tid}`).textContent = solved+'/5 resueltos';
+  document.getElementById(`pct-${tid}`).textContent = solved+'/5';
+}
+</script>
+</body>
+</html>
